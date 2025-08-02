@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Yappy</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 15px;
+            background-color: #f0f4f8;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 600px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #1a73e8;
+            margin-bottom: 25px;
+            font-size: 1.75em;
+        }
+
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #1a73e8;
+            padding-bottom: 8px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #5f6368;
+            font-size: 0.95em;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            font-size: 1em;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+            outline: none;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .action-button {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: auto;
+            gap: 8px;
+        }
+
+        .action-button:hover {
+            background-color: #1558b0;
+        }
+        .action-button:active {
+            transform: translateY(1px);
+        }
+
+        .add-loan-btn {
+            background-color: #34a853;
+            width: 100%;
+        }
+        .add-loan-btn:hover {
+            background-color: #2b8a43;
+        }
+
+        .loan-entry {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 10px;
+        }
+
+        .loan-entry .timestamp-display {
+            font-size: 0.75em;
+            color: #5f6368;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .loan-entry input[type="number"].loan-amount {
+            flex-grow: 1;
+            margin-bottom: 0;
+        }
+
+        .loan-entry .delete-loan-btn {
+            background-color: #ea4335;
+            color: white;
+            border: none;
+            padding: 0;
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .loan-entry .delete-loan-btn:hover {
+            background-color: #c5372c;
+        }
+        .loan-entry .delete-loan-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group input[type="number"] {
+            flex-grow: 1;
+            margin-bottom: 0;
+        }
+
+        .input-group button {
+            flex-shrink: 0;
+            padding: 12px 18px;
+        }
+
+        .entries-list {
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            padding: 5px 10px;
+            background-color: #f9f9f9;
+        }
+
+        .entries-list:empty::before, .empty-list-message {
+            display: block;
+            padding: 15px;
+            text-align: center;
+            color: #757575;
+            font-style: italic;
+            background-color: transparent;
+        }
+        #paymentEntriesContainer:empty::before {
+            content: "No hay abonos registrados aún.";
+        }
+        #loanEntriesContainer:empty::before {
+            content: "No hay préstamos registrados aún.";
+        }
+
+        .payment-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 5px;
+            border-bottom: 1px solid #e8eaed;
+            font-size: 0.9em;
+        }
+
+        .payment-entry:last-child {
+            border-bottom: none;
+        }
+
+        .payment-entry .payment-amount-display {
+            font-weight: 500;
+            color: #34a853;
+        }
+
+        .payment-entry .timestamp-display {
+            font-size: 0.85em;
+            color: #5f6368;
+            white-space: nowrap;
+            margin-left: 10px;
+        }
+
+        .summary p {
+            font-size: 1.05em;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .summary p span, .summary p strong {
+            font-weight: 600;
+            color: #202124;
+        }
+
+        .summary .balance {
+            margin-top: 15px;
+            border-top: 1px solid #dadce0;
+            padding-top: 15px;
+        }
+
+        .summary .balance strong {
+            font-size: 1.25em;
+        }
+        .summary .balance strong.negative-balance {
+            color: #d93025;
+        }
+        .summary .balance strong.positive-balance {
+            color: #34a853;
+        }
+
+        #overallSummaryContainer {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .summary-card {
+            flex: 1;
+            min-width: 200px;
+            background-color: #e8f0fe;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .summary-card h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            color: #1a73e8;
+        }
+
+        .summary-card .summary-card-amount {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #202124;
+            margin: 0;
+        }
+
+        .new-client-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .new-client-section input[type="text"] {
+            margin-bottom: 0;
+        }
+
+        .new-client-section #addNewClientBtn {
+            background-color: #4285f4;
+            width: 100%;
+        }
+        .new-client-section #addNewClientBtn:hover {
+            background-color: #3367d6;
+        }
+
+        #clientListContainer {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .client-list-item {
+            background-color: #fff;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .client-list-item:hover {
+            border-color: #1a73e8;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .client-list-item .client-name {
+            font-size: 1.15em;
+            font-weight: 600;
+            color: #1a73e8;
+        }
+
+        .client-list-item .client-summary {
+            font-size: 0.9em;
+            color: #5f6368;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+        .client-list-item .client-summary span {
+            margin-right: 10px;
+        }
+        .client-list-item .client-summary strong {
+            font-weight: bold;
+        }
+        .client-list-item .client-summary .positive-balance {
+            color: #1e8e3e;
+        }
+        .client-list-item .client-summary .negative-balance {
+            color: #c9372c;
+        }
+
+        .back-button {
+            background-color: #6c757d;
+            margin-bottom: 20px;
+            width: auto;
+        }
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+
+        @media (max-width: 480px) {
+            .loan-entry .timestamp-display {
+                font-size: 0.7em;
+            }
+            #overallSummaryContainer {
+                flex-direction: column;
+            }
+            .summary-card {
+                min-width: 100%;
+            }
+            .payment-entry .timestamp-display {
+                font-size: 0.8em;
+            }
+            .payment-entry {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+            .payment-entry .timestamp-display {
+                margin-left: 0;
+            }
+            .client-list-item .client-summary {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            .client-list-item .client-summary span {
+                margin-right: 0;
+            }
+        }
+
+        @media (max-width: 400px) {
+            body {
+                padding: 10px;
+            }
+            #app-container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.6em;
+            }
+            h2 {
+                font-size: 1.2em;
+            }
+            .action-button, input[type="text"], input[type="number"] {
+                font-size: 0.95em;
+                padding: 10px;
+            }
+            .loan-entry .delete-loan-btn {
+                width: 40px;
+                height: 40px;
+            }
+            .loan-entry .delete-loan-btn svg {
+                width: 18px;
+                height: 18px;
+            }
+            .input-group button {
+                padding: 10px 15px;
+            }
+            .entries-list {
+                max-height: 150px;
+            }
+        }
+
+.client-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.client-date {
+    font-size: 0.8em;
+    color: #757575;
+}
+
+.client-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.client-actions .action-button {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.view-client-btn {
+    background-color: #1a73e8;
+}
+.view-client-btn:hover {
+    background-color: #1558b0;
+}
+
+.delete-client-btn {
+    background-color: #ea4335;
+}
+.delete-client-btn:hover {
+    background-color: #c5372c;
+}
+
+/* Modificar el estilo de la tarjeta de cliente para la nueva estructura */
+.client-list-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 15px;
+}
+
+/* Estilos adicionales para la eliminación de cobros */
+.payment-entry {
+    position: relative;
+}
+
+.delete-payment-btn {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #ea4335;
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.payment-entry:hover .delete-payment-btn {
+    opacity: 1;
+}
+
+.delete-payment-btn:hover {
+    background-color: #c5372c;
+}
+
+.delete-payment-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+@media (max-width: 480px) {
+    .client-list-item {
+        padding: 12px;
+    }
+    
+    .client-actions .action-button {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .client-actions .action-button svg {
+        width: 14px;
+        height: 14px;
+    }
+    
+    .delete-payment-btn {
+        width: 26px;
+        height: 26px;
+    }
+    
+    .delete-payment-btn svg {
+        width: 14px;
+        height: 14px;
+    }
+}
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <!-- Content will be dynamically generated by JavaScript -->
+    </div>
+
+    <script>
+     document.addEventListener('DOMContentLoaded', () => {
+    const appContainer = document.getElementById('app-container');
+
+    let clients = [];
+    let currentView = 'clientList'; // 'clientList' o 'clientDetail'
+    let currentClientId = null;
+    let globalDiscounts = []; // Nuevo array para descuentos globales
+
+    // --- Utility Functions ---
+    function generateId() {
+        return Date.now().toString(36) + Math.random().toString(36).substring(2, 5);
+    }
+
+    // resto del código...
+            function formatDate(date) {
+                const d = new Date(date); // Ensure it's a Date object
+                return d.toLocaleString('es-ES', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                });
+            }
+
+            // --- Data Persistence ---
+            function saveData() {
+    localStorage.setItem('loanAppData', JSON.stringify({ 
+        clients, 
+        currentView, 
+        currentClientId,
+        globalDiscounts // Guardar descuentos globales
+    }));
+}
+
+function loadData() {
+    const data = localStorage.getItem('loanAppData');
+    if (data) {
+        const parsedData = JSON.parse(data);
+        clients = parsedData.clients || [];
+        globalDiscounts = parsedData.globalDiscounts || []; // Cargar descuentos globales
+        
+        // Añadir fecha de creación a los clientes que no la tengan
+        clients.forEach(client => {
+            if (!client.createdAt) {
+                client.createdAt = new Date().toISOString();
+            }
+        });
+        
+        // Actualizar los datos almacenados con las fechas de creación
+        saveData();
+    } else {
+        clients = [];
+        globalDiscounts = [];
+    }
+}
+
+            // --- Client Data Calculations ---
+            function calculateClientSummary(client) {
+    // Asegurarse de que los loans y payments existan y sean arrays
+    const loans = client.loans || [];
+    const payments = client.payments || [];
+    
+    // Calcular totales con validaciones para evitar errores
+    const totalLoans = loans.reduce((sum, loan) => {
+        const amount = parseFloat(loan.amount) || 0;
+        return sum + amount;
+    }, 0);
+    
+    const totalPayments = payments.reduce((sum, payment) => {
+        const amount = parseFloat(payment.amount) || 0;
+        return sum + amount;
+    }, 0);
+    
+    const balance = totalLoans - totalPayments;
+    
+    return { totalLoans, totalPayments, balance };
+}
+
+            // --- Rendering Functions ---
+function render() {
+    appContainer.innerHTML = ''; // Clear previous content
+    if (currentView === 'clientList') {
+        renderClientListView();
+    } else if (currentView === 'clientDetail' && currentClientId) {
+        const client = clients.find(c => c.id === currentClientId);
+        if (client) {
+            renderClientDetailView(client);
+        } else {
+            // Client not found, switch back to list
+            currentView = 'clientList';
+            currentClientId = null;
+            saveData(); // Save state change
+            render();
+        }
+    } else if (currentView === 'discountView') {
+        renderDiscountView();
+    }
+    // Add a small footer or branding
+    const footer = document.createElement('p');
+    footer.textContent = 'Gestor de Yappy v1.0';
+    footer.style.textAlign = 'center';
+    footer.style.fontSize = '0.8em';
+    footer.style.color = '#aaa';
+    footer.style.marginTop = '30px';
+    appContainer.appendChild(footer);
+}
+
+        function renderClientListView() {
+    const title = document.createElement('h1');
+    title.textContent = 'Gestor de Yappy';
+    appContainer.appendChild(title);
+
+    // --- Overall Summary Cards ---
+    const overallSummaryContainer = document.createElement('div');
+    overallSummaryContainer.id = 'overallSummaryContainer';
+    
+    const globalSummary = calculateGlobalSummary();
+
+    const totalLoanedCard = document.createElement('div');
+    totalLoanedCard.classList.add('summary-card');
+    totalLoanedCard.innerHTML = `
+        <h3>Yappy Totales (Todos)</h3>
+        <p class="summary-card-amount">${globalSummary.totalLoansAllClients.toFixed(2)}</p>
+    `;
+    overallSummaryContainer.appendChild(totalLoanedCard);
+
+    const totalPaidCard = document.createElement('div');
+    totalPaidCard.classList.add('summary-card');
+    totalPaidCard.innerHTML = `
+        <h3>Total Cobrado (Todos)</h3>
+        <p class="summary-card-amount">${globalSummary.totalPaymentsAllClients.toFixed(2)}</p>
+    `;
+    totalPaidCard.style.cursor = 'pointer';
+    
+    // Agregar evento de clic para la tarjeta de descuentos
+    const totalDiscountCard = document.createElement('div');
+    totalDiscountCard.classList.add('summary-card');
+    totalDiscountCard.style.cursor = 'pointer';
+    totalDiscountCard.innerHTML = `
+        <h3>Total Descuento</h3>
+        <p class="summary-card-amount">${globalSummary.totalDiscounts.toFixed(2)}</p>
+    `;
+    totalDiscountCard.addEventListener('click', () => {
+        currentView = 'discountView';
+        saveData();
+        render();
+    });
+    
+    const totalPositiveCard = document.createElement('div');
+    totalPositiveCard.classList.add('summary-card');
+    totalPositiveCard.innerHTML = `
+        <h3>Total Positivo</h3>
+        <p class="summary-card-amount">${globalSummary.totalPositive.toFixed(2)}</p>
+    `;
+    
+    overallSummaryContainer.appendChild(totalLoanedCard);
+    overallSummaryContainer.appendChild(totalPaidCard);
+    overallSummaryContainer.appendChild(totalDiscountCard);
+    overallSummaryContainer.appendChild(totalPositiveCard);
+    appContainer.appendChild(overallSummaryContainer);
+
+    // Add New Client Form
+    const newClientSection = document.createElement('div');
+    newClientSection.classList.add('section', 'new-client-section');
+
+    const nameLabel = document.createElement('label');
+    nameLabel.setAttribute('for', 'newClientNameInput');
+    nameLabel.textContent = 'Nombre del Nuevo Cliente:';
+    
+    const newClientNameInput = document.createElement('input');
+    newClientNameInput.type = 'text';
+    newClientNameInput.id = 'newClientNameInput';
+    newClientNameInput.placeholder = 'Ingrese nombre del cliente';
+
+    const addClientBtn = document.createElement('button');
+    addClientBtn.id = 'addNewClientBtn';
+    addClientBtn.classList.add('action-button');
+    addClientBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">
+            <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+            <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5v2.5a.5.5 0 0 1-1 0V6.707l-3.646 3.647a.5.5 0 0 1-.708-.708L12.293 6H10.5a.5.5 0 0 1 0-1h3a.5.5 0 0 1 .5.5z"/>
+        </svg>
+        Añadir Cliente`;
+    addClientBtn.addEventListener('click', () => {
+        const name = newClientNameInput.value.trim();
+        if (name) {
+            clients.push({
+                id: generateId(),
+                name: name,
+                loans: [],
+                payments: [],
+                createdAt: new Date().toISOString() // Añadimos fecha de creación
+            });
+            newClientNameInput.value = '';
+            saveData();
+            render();
+        } else {
+            alert('Por favor, ingrese un nombre para el cliente.');
+        }
+    });
+    
+    newClientSection.appendChild(nameLabel);
+    newClientSection.appendChild(newClientNameInput);
+    newClientSection.appendChild(addClientBtn);
+    appContainer.appendChild(newClientSection);
+
+    // Client List
+    const clientListTitle = document.createElement('h2');
+    clientListTitle.textContent = 'Clientes Registrados';
+    appContainer.appendChild(clientListTitle);
+
+    const clientListContainer = document.createElement('div');
+    clientListContainer.id = 'clientListContainer';
+    if (clients.length === 0) {
+        const noClientsMsg = document.createElement('p');
+        noClientsMsg.classList.add('empty-list-message');
+        noClientsMsg.textContent = 'No hay clientes registrados aún. Añada uno para comenzar.';
+        clientListContainer.appendChild(noClientsMsg);
+    } else {
+        clients.forEach(client => {
+            const summary = calculateClientSummary(client);
+            const clientItem = document.createElement('div');
+            clientItem.classList.add('client-list-item');
+            
+            // Obtener fecha de creación (puede ser indefinida para clientes antiguos)
+            const creationDate = client.createdAt ? formatDate(client.createdAt) : 'No disponible';
+            
+            clientItem.innerHTML = `
+                <div class="client-info">
+                    <div class="client-name">${client.name}</div>
+                    <div class="client-date">Creado: ${creationDate}</div>
+                </div>
+                <div class="client-summary">
+                    <span>YAPPY: ${summary.totalLoans.toFixed(2)}</span>
+                    <span>COBRADO: ${summary.totalPayments.toFixed(2)}</span>
+                    <strong class="${summary.balance >= 0 ? 'positive-balance' : 'negative-balance'}">Saldo: ${summary.balance.toFixed(2)}</strong>
+                </div>
+                <div class="client-actions">
+                    <button class="action-button view-client-btn" aria-label="Ver detalles">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                            <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                            <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+                        </svg>
+                    </button>
+                    <button class="action-button delete-client-btn" aria-label="Eliminar cliente">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                            <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5Z"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            // Añadir eventos a los botones
+            const viewBtn = clientItem.querySelector('.view-client-btn');
+            viewBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Evitar que se propague al clientItem
+                currentView = 'clientDetail';
+                currentClientId = client.id;
+                saveData();
+                render();
+            });
+            
+            const deleteBtn = clientItem.querySelector('.delete-client-btn');
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Evitar que se propague al clientItem
+                if (confirm(`¿Está seguro de que desea eliminar al cliente "${client.name}" y todos sus registros?`)) {
+                    clients = clients.filter(c => c.id !== client.id);
+                    saveData();
+                    render();
+                }
+            });
+            
+            // Mantener el evento click en toda la tarjeta para ver detalles
+            clientItem.addEventListener('click', () => {
+                currentView = 'clientDetail';
+                currentClientId = client.id;
+                saveData();
+                render();
+            });
+            
+            clientListContainer.appendChild(clientItem);
+        });
+    }
+    appContainer.appendChild(clientListContainer);
+}
+
+            function renderClientDetailView(client) {
+                // Back Button
+                const backButton = document.createElement('button');
+                backButton.id = 'backToListBtn';
+                backButton.classList.add('action-button', 'back-button');
+                backButton.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+                        <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z"/>
+                    </svg>
+                    Atrás`;
+                backButton.addEventListener('click', () => {
+                    currentView = 'clientList';
+                    currentClientId = null;
+                    saveData(); // Save view change
+                    render();
+                });
+                appContainer.appendChild(backButton);
+
+                const title = document.createElement('h1');
+                title.textContent = `Detalles de: ${client.name}`;
+                appContainer.appendChild(title);
+
+                // Loans Section
+                const loansSection = document.createElement('div');
+                loansSection.classList.add('section');
+                const loansTitle = document.createElement('h2');
+                loansTitle.textContent = 'YAPPY';
+                loansSection.appendChild(loansTitle);
+
+                const loanEntriesContainer = document.createElement('div');
+                loanEntriesContainer.id = 'loanEntriesContainer'; // For existing CSS
+                client.loans.forEach((loan, index) => {
+                    loanEntriesContainer.appendChild(createLoanEntryElement(client, loan, index));
+                });
+                loansSection.appendChild(loanEntriesContainer);
+
+                const addLoanEntryBtn = document.createElement('button');
+                addLoanEntryBtn.id = 'addLoanEntryBtn'; // For existing CSS
+                addLoanEntryBtn.classList.add('action-button', 'add-loan-btn');
+                addLoanEntryBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+                    </svg>
+                    Añadir YAPPY`;
+                addLoanEntryBtn.addEventListener('click', () => {
+                    const newLoan = { id: generateId(), amount: 0, date: new Date().toISOString() };
+                    client.loans.push(newLoan);
+                    saveData();
+                    const newLoanEntryElement = createLoanEntryElement(client, newLoan, client.loans.length - 1);
+                    loanEntriesContainer.appendChild(newLoanEntryElement);
+                    newLoanEntryElement.querySelector('.loan-amount').focus();
+                    updateClientDetailSummary(client);
+                });
+                loansSection.appendChild(addLoanEntryBtn);
+                appContainer.appendChild(loansSection);
+
+                // Payments Section
+                const paymentsSection = document.createElement('div');
+                paymentsSection.classList.add('section');
+                const paymentsTitle = document.createElement('h2');
+                paymentsTitle.textContent = 'COBROS';
+                paymentsSection.appendChild(paymentsTitle);
+                
+                const paymentInputGroup = document.createElement('div');
+                paymentInputGroup.classList.add('input-group');
+                const paymentAmountInput = document.createElement('input');
+                paymentAmountInput.type = 'number';
+                paymentAmountInput.id = 'paymentAmountInput'; // For existing CSS
+                paymentAmountInput.placeholder = 'Monto a abonar';
+                paymentAmountInput.min = "0.01";
+                paymentAmountInput.step = "0.01";
+                paymentAmountInput.addEventListener('change', () => {
+                     if (paymentAmountInput.value) {
+                        const val = parseFloat(paymentAmountInput.value);
+                        paymentAmountInput.value = val > 0 ? val.toFixed(2) : '';
+                     }
+                });
+
+                const addPaymentBtn = document.createElement('button');
+                addPaymentBtn.id = 'addPaymentBtn'; // For existing CSS
+                addPaymentBtn.classList.add('action-button');
+                addPaymentBtn.textContent = 'Registrar Cobro';
+               addPaymentBtn.addEventListener('click', () => {
+    const paymentValue = parseFloat(paymentAmountInput.value);
+    if (!isNaN(paymentValue) && paymentValue > 0) {
+        client.payments.push({ amount: paymentValue, date: new Date().toISOString() });
+        saveData();
+        
+        // En lugar de renderizar toda la vista, actualizamos solo lo necesario
+        updateClientDetailSummary(client);
+        
+        // Limpiar y rellenar el contenedor de pagos
+        paymentEntriesContainer.innerHTML = '';
+        if (client.payments.length === 0) {
+            paymentEntriesContainer.innerHTML = '<p class="empty-list-message">No hay cobros registrados.</p>';
+        } else {
+            client.payments.slice().reverse().forEach((payment, reversedIndex) => {
+                const actualIndex = client.payments.length - 1 - reversedIndex;
+                addPaymentEntryToDOM(paymentEntriesContainer, payment, client, actualIndex);
+            });
+        }
+        
+        paymentAmountInput.value = '';
+    } else {
+        alert('Por favor, ingrese un monto de cobro válido y positivo.');
+        paymentAmountInput.value = '';
+    }
+    paymentAmountInput.focus();
+});
+                paymentInputGroup.appendChild(paymentAmountInput);
+                paymentInputGroup.appendChild(addPaymentBtn);
+                paymentsSection.appendChild(paymentInputGroup);
+
+               const paymentEntriesContainer = document.createElement('div');
+paymentEntriesContainer.id = 'paymentEntriesContainer'; // For existing CSS
+paymentEntriesContainer.classList.add('entries-list');
+if (client.payments.length === 0) {
+    paymentEntriesContainer.innerHTML = '<p class="empty-list-message">No hay cobros registrados.</p>';
+} else {
+    client.payments.slice().reverse().forEach((payment, reversedIndex) => { 
+        // Necesitamos calcular el índice real en el array original
+        const actualIndex = client.payments.length - 1 - reversedIndex;
+        addPaymentEntryToDOM(paymentEntriesContainer, payment, client, actualIndex);
+    });
+}
+                paymentsSection.appendChild(paymentEntriesContainer);
+                appContainer.appendChild(paymentsSection);
+
+                // Summary Section
+                const summarySection = document.createElement('div');
+                summarySection.classList.add('section', 'summary');
+                const summaryTitle = document.createElement('h2');
+                summaryTitle.textContent = 'Resumen';
+                summarySection.appendChild(summaryTitle);
+                
+                summarySection.innerHTML += `
+                    <p>Total Yappy: <span id="totalLoansDisplay">0.00</span></p>
+                    <p>Total Cobrado: <span id="totalPaymentsDisplay">0.00</span></p>
+                    <p class="balance">Saldo Pendiente: <strong id="balanceDisplay">0.00</strong></p>
+                `;
+                appContainer.appendChild(summarySection);
+                updateClientDetailSummary(client); // Initial summary calculation
+            }
+
+            function createLoanEntryElement(client, loan, loanIndex) {
+                const entryDiv = document.createElement('div');
+                entryDiv.classList.add('loan-entry');
+
+                const timestampSpan = document.createElement('span');
+                timestampSpan.classList.add('timestamp-display');
+                timestampSpan.textContent = formatDate(loan.date);
+
+                const amountInput = document.createElement('input');
+                amountInput.type = 'number';
+                amountInput.classList.add('loan-amount');
+                amountInput.placeholder = 'Monto del yappy';
+                amountInput.min = "0.01";
+                amountInput.step = "0.01";
+                amountInput.value = parseFloat(loan.amount).toFixed(2);
+
+                amountInput.addEventListener('input', () => {
+                    if (parseFloat(amountInput.value) < 0) amountInput.value = '';
+                });
+                amountInput.addEventListener('change', () => {
+    const val = parseFloat(amountInput.value);
+    const newAmount = val > 0 ? val : 0;
+    loan.amount = newAmount;
+    amountInput.value = newAmount > 0 ? newAmount.toFixed(2) : '';
+    if (newAmount <= 0) {
+        client.loans.splice(loanIndex, 1);
+        saveData();
+        render(); // Usar render() en lugar de renderClientDetailView(client)
+    } else {
+        saveData();
+        updateClientDetailSummary(client);
+    }
+});
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.classList.add('delete-loan-btn');
+                deleteBtn.setAttribute('aria-label', 'Eliminar YAPPY');
+                deleteBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                        <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5Z"/>
+                    </svg>`;
+               deleteBtn.addEventListener('click', () => {
+    if (confirm(`¿Está seguro de que desea eliminar este yappy de ${parseFloat(loan.amount).toFixed(2)}?`)) {
+        client.loans.splice(loanIndex, 1);
+        saveData();
+        render(); // Usar render() en lugar de renderClientDetailView(client)
+    }
+});
+                
+                entryDiv.appendChild(timestampSpan);
+                entryDiv.appendChild(amountInput);
+                entryDiv.appendChild(deleteBtn);
+
+                return entryDiv;
+            }
+function addPaymentEntryToDOM(container, payment, client, paymentIndex) {
+    const entryDiv = document.createElement('div');
+    entryDiv.classList.add('payment-entry');
+
+    const amountSpan = document.createElement('span');
+    amountSpan.classList.add('payment-amount-display');
+    amountSpan.textContent = `Cobro: ${parseFloat(payment.amount).toFixed(2)}`;
+
+    const timestampSpan = document.createElement('span');
+    timestampSpan.classList.add('timestamp-display');
+    timestampSpan.textContent = formatDate(payment.date);
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.classList.add('delete-payment-btn');
+    deleteBtn.setAttribute('aria-label', 'Eliminar cobro');
+    deleteBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+        </svg>
+    `;
+    
+    deleteBtn.addEventListener('click', () => {
+    if (confirm(`¿Está seguro de que desea eliminar este cobro de ${parseFloat(payment.amount).toFixed(2)}?`)) {
+        // Asegurarnos de que client y paymentIndex estén definidos
+        if (client && paymentIndex !== undefined) {
+            client.payments.splice(paymentIndex, 1);
+            saveData();
+            render(); // Usar render() en lugar de renderClientDetailView(client)
+        } else {
+            alert('Error: No se puede eliminar este cobro. Por favor, recargue la página.');
+        }
+    }
+});
+
+    entryDiv.appendChild(amountSpan);
+    entryDiv.appendChild(timestampSpan);
+    entryDiv.appendChild(deleteBtn);
+    container.appendChild(entryDiv);
+}
+
+function updateClientDetailSummary(client) {
+    const summary = calculateClientSummary(client);
+    
+    // Obtener referencias a los elementos
+    const totalLoansDisplay = document.getElementById('totalLoansDisplay');
+    const totalPaymentsDisplay = document.getElementById('totalPaymentsDisplay');
+    const balanceDisplay = document.getElementById('balanceDisplay');
+    
+    // Actualizar los valores si los elementos existen
+    if (totalLoansDisplay) {
+        totalLoansDisplay.textContent = summary.totalLoans.toFixed(2);
+    }
+    
+    if (totalPaymentsDisplay) {
+        totalPaymentsDisplay.textContent = summary.totalPayments.toFixed(2);
+    }
+    
+    if (balanceDisplay) {
+        balanceDisplay.textContent = summary.balance.toFixed(2);
+        
+        // Actualizar la clase para el color
+        if (summary.balance >= 0) {
+            balanceDisplay.classList.add('positive-balance');
+            balanceDisplay.classList.remove('negative-balance');
+        } else {
+            balanceDisplay.classList.add('negative-balance');
+            balanceDisplay.classList.remove('positive-balance');
+        }
+    }
+}
+
+function calculateGlobalSummary() {
+    let totalLoansAllClients = 0;
+    let totalPaymentsAllClients = 0;
+    
+    clients.forEach(client => {
+        const loans = client.loans || [];
+        const payments = client.payments || [];
+        
+        totalLoansAllClients += loans.reduce((sum, loan) => {
+            return sum + (parseFloat(loan.amount) || 0);
+        }, 0);
+        
+        totalPaymentsAllClients += payments.reduce((sum, payment) => {
+            return sum + (parseFloat(payment.amount) || 0);
+        }, 0);
+    });
+    
+    const totalDiscounts = globalDiscounts.reduce((sum, discount) => {
+        return sum + (parseFloat(discount.amount) || 0);
+    }, 0);
+    
+    const totalPositive = totalPaymentsAllClients - totalDiscounts;
+    
+    return {
+        totalLoansAllClients,
+        totalPaymentsAllClients,
+        totalDiscounts,
+        totalPositive
+    };
+}
+
+function renderDiscountView() {
+    // Limpiar contenedor
+    appContainer.innerHTML = '';
+    
+    // Back Button
+    const backButton = document.createElement('button');
+    backButton.classList.add('action-button', 'back-button');
+    backButton.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+            <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z"/>
+        </svg>
+        Atrás`;
+    backButton.addEventListener('click', () => {
+        currentView = 'clientList';
+        saveData();
+        render();
+    });
+    appContainer.appendChild(backButton);
+
+    const title = document.createElement('h1');
+    title.textContent = 'Gestión de Descuentos';
+    appContainer.appendChild(title);
+
+    // Descuentos Section
+    const discountsSection = document.createElement('div');
+    discountsSection.classList.add('section');
+    const discountsTitle = document.createElement('h2');
+    discountsTitle.textContent = 'DESCUENTOS';
+    discountsSection.appendChild(discountsTitle);
+    
+    const discountInputGroup = document.createElement('div');
+discountInputGroup.classList.add('input-group');
+discountInputGroup.style.display = 'flex';
+discountInputGroup.style.alignItems = 'center';
+discountInputGroup.style.gap = '10px';
+
+const discountDescriptionInput = document.createElement('input');
+discountDescriptionInput.type = 'text';
+discountDescriptionInput.placeholder = 'Detalle';
+discountDescriptionInput.style.flex = '2'; // Dar más espacio al campo de detalle
+
+const discountAmountInput = document.createElement('input');
+discountAmountInput.type = 'number';
+discountAmountInput.placeholder = 'Monto';
+discountAmountInput.min = "0.01";
+discountAmountInput.step = "0.01";
+discountAmountInput.style.flex = '1'; // Dar menos espacio al campo de monto
+discountAmountInput.addEventListener('change', () => {
+    if (discountAmountInput.value) {
+        const val = parseFloat(discountAmountInput.value);
+        discountAmountInput.value = val > 0 ? val.toFixed(2) : '';
+    }
+});
+
+const addDiscountBtn = document.createElement('button');
+addDiscountBtn.classList.add('action-button');
+addDiscountBtn.textContent = 'OK';
+addDiscountBtn.style.width = 'auto'; // Ajustar el ancho al contenido
+addDiscountBtn.style.padding = '10px 15px'; // Reducir el padding para hacerlo más pequeño
+addDiscountBtn.style.fontSize = '0.9em'; // Reducir el tamaño de la fuente
+
+// Agregar evento de clic (el código existente)
+addDiscountBtn.addEventListener('click', () => {
+    const discountValue = parseFloat(discountAmountInput.value);
+    const description = discountDescriptionInput.value.trim();
+    
+    if (!isNaN(discountValue) && discountValue > 0 && description) {
+        globalDiscounts.push({ 
+            id: generateId(),
+            amount: discountValue, 
+            description: description,
+            date: new Date().toISOString() 
+        });
+        saveData();
+        
+        // Actualizar la vista
+        renderDiscountEntries(discountEntriesContainer);
+        
+        discountAmountInput.value = '';
+        discountDescriptionInput.value = '';
+    } else {
+        alert('Por favor, ingrese un monto válido y una descripción para el descuento.');
+    }
+    discountDescriptionInput.focus();
+});
+
+discountInputGroup.appendChild(discountDescriptionInput);
+discountInputGroup.appendChild(discountAmountInput);
+discountInputGroup.appendChild(addDiscountBtn);
+discountsSection.appendChild(discountInputGroup);
+
+    const discountEntriesContainer = document.createElement('div');
+    discountEntriesContainer.classList.add('entries-list');
+    renderDiscountEntries(discountEntriesContainer);
+    discountsSection.appendChild(discountEntriesContainer);
+    appContainer.appendChild(discountsSection);
+    
+    // Summary Section
+    const summarySection = document.createElement('div');
+    summarySection.classList.add('section', 'summary');
+    const summaryTitle = document.createElement('h2');
+    summaryTitle.textContent = 'Resumen';
+    summarySection.appendChild(summaryTitle);
+    
+    const globalSummary = calculateGlobalSummary();
+    
+    summarySection.innerHTML += `
+        <p>Total Yappy: <span>${globalSummary.totalLoansAllClients.toFixed(2)}</span></p>
+        <p>Total Cobrado: <span>${globalSummary.totalPaymentsAllClients.toFixed(2)}</span></p>
+        <p>Total Descuentos: <span>${globalSummary.totalDiscounts.toFixed(2)}</span></p>
+        <p class="balance">Total Positivo: <strong>${globalSummary.totalPositive.toFixed(2)}</strong></p>
+    `;
+    appContainer.appendChild(summarySection);
+}
+
+function renderDiscountEntries(container) {
+    container.innerHTML = '';
+    if (!globalDiscounts || globalDiscounts.length === 0) {
+        container.innerHTML = '<p class="empty-list-message">No hay descuentos registrados.</p>';
+        return;
+    }
+    
+    // Ordenar descuentos por fecha (más recientes primero)
+    globalDiscounts.slice().reverse().forEach((discount, reversedIndex) => {
+        const actualIndex = globalDiscounts.length - 1 - reversedIndex;
+        
+        const entryDiv = document.createElement('div');
+        entryDiv.classList.add('payment-entry');
+
+        const amountSpan = document.createElement('span');
+        amountSpan.classList.add('payment-amount-display');
+        amountSpan.textContent = `${discount.description}: ${parseFloat(discount.amount).toFixed(2)}`;
+
+        const timestampSpan = document.createElement('span');
+        timestampSpan.classList.add('timestamp-display');
+        timestampSpan.textContent = formatDate(discount.date);
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.classList.add('delete-payment-btn');
+        deleteBtn.setAttribute('aria-label', 'Eliminar descuento');
+        deleteBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+            </svg>
+        `;
+        
+        deleteBtn.addEventListener('click', () => {
+            if (confirm(`¿Está seguro de que desea eliminar este descuento de ${parseFloat(discount.amount).toFixed(2)}?`)) {
+                globalDiscounts.splice(actualIndex, 1);
+                saveData();
+                renderDiscountEntries(container);
+                
+                // Actualizar el resumen también
+                const globalSummary = calculateGlobalSummary();
+                document.querySelector('.summary p:nth-child(3) span').textContent = globalSummary.totalDiscounts.toFixed(2);
+                document.querySelector('.summary p:nth-child(4) strong').textContent = globalSummary.totalPositive.toFixed(2);
+            }
+        });
+
+        entryDiv.appendChild(amountSpan);
+        entryDiv.appendChild(timestampSpan);
+        entryDiv.appendChild(deleteBtn);
+        container.appendChild(entryDiv);
+    });
+}
+            
+            // --- Initialization ---
+            loadData();
+            render();
+        });
+    </script>
+</body>
+</html>
